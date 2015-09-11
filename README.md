@@ -15,7 +15,7 @@ Using the **Gimbal Manager**:
 - fill your API KEY into the MainActivity
 - add the jars from the SDK libs directory to the project libs directory
 
-Full Gimbal Docs [https://gimbal.com/docs](https://gimbal.com/docs)
+Full Gimbal Docs [http://docs.gimbal.com/](http://docs.gimbal.com/)
 
 ```java
 package com.gimbal.hello_gimbal_android;
