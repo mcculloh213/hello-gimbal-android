@@ -24,7 +24,8 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.0.0'
-    compile files('libs/gimbal.jar')
+    compile 'com.gimbal.android.v2:gimbal-sdk:2.41'
+    compile 'com.gimbal.android.v2:gimbal-slf4j-impl:2.41'
+    compile 'org.slf4j:slf4j-api:1.7.21'
 }
