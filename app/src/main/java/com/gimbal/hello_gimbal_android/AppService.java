@@ -30,7 +30,7 @@ public class AppService extends Service {
     @Override
     public void onCreate(){
         events = new LinkedList<>(GimbalDAO.getEvents(getApplicationContext()));
-        Gimbal.setApiKey(this.getApplication(), "83bc87c6-f009-460c-b003-bc48d623ba0c");
+        Gimbal.setApiKey(this.getApplication(), "YOUR API KEY HERE");
 
         // Setup PlaceEventListener
         placeEventListener = new PlaceEventListener() {
