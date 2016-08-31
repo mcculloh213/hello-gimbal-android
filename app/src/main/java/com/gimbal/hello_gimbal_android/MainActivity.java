@@ -1,56 +1,78 @@
 package com.gimbal.hello_gimbal_android;
 
-import android.support.v7.app.ActionBarActivity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
+import android.support.v7.app.ActionBarActivity;
 import android.widget.ListView;
-
-import com.gimbal.android.CommunicationManager;
-import com.gimbal.android.Gimbal;
-import com.gimbal.android.PlaceEventListener;
-import com.gimbal.android.PlaceManager;
-import com.gimbal.android.Visit;
 
 
 public class MainActivity extends ActionBarActivity {
-
-    private PlaceManager placeManager;
-    private PlaceEventListener placeEventListener;
-    private ArrayAdapter<String> listAdapter;
-    private ListView listView;
+    private GimbalEventReceiver gimbalEventReceiver;
+    private GimbalEventListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        listAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1);
-        listView = (ListView) findViewById(R.id.list);
-        listView.setAdapter(listAdapter);
+        startService(new Intent(this, AppService.class));
 
-        listAdapter.add("Setting Gimbal API Key");
-        listAdapter.notifyDataSetChanged();
-        Gimbal.setApiKey(this.getApplication(), "YOUR_API_KEY_HERE");
 
-        placeEventListener = new PlaceEventListener() {
-            @Override
-            public void onVisitStart(Visit visit) {
-                listAdapter.add(String.format("Start Visit for %s", visit.getPlace().getName()));
-                listAdapter.notifyDataSetChanged();
-            }
+        adapter = new GimbalEventListAdapter(this);
 
-            @Override
-            public void onVisitEnd(Visit visit) {
-                listAdapter.add(String.format("End Visit for %s", visit.getPlace().getName()));
-                listAdapter.notifyDataSetChanged();
-            }
-        };
-
-        placeManager = PlaceManager.getInstance();
-        placeManager.addListener(placeEventListener);
-        placeManager.startMonitoring();
-
-        CommunicationManager.getInstance().startReceivingCommunications();
+        ListView listView = (ListView) findViewById(R.id.listview);
+        listView.setAdapter(adapter);
     }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        adapter.setEvents(GimbalDAO.getEvents(getApplicationContext()));
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        gimbalEventReceiver = new GimbalEventReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(GimbalDAO.GIMBAL_NEW_EVENT_ACTION);
+        intentFilter.addAction(AppService.APPSERVICE_STARTED_ACTION);
+        registerReceiver(gimbalEventReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(gimbalEventReceiver);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    class GimbalEventReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction() != null) {
+                if (intent.getAction().compareTo(GimbalDAO.GIMBAL_NEW_EVENT_ACTION) == 0) {
+                    adapter.setEvents(GimbalDAO.getEvents(getApplicationContext()));
+                }
+            }
+        }
+    }
+
 
 }
