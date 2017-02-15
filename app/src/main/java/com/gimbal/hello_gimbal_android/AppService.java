@@ -17,22 +17,54 @@ import com.gimbal.android.Visit;
 import java.util.LinkedList;
 import java.util.List;
 
-;
-
-
 public class AppService extends Service {
+
+    public static final String APPSERVICE_STARTED_ACTION = "appservice_started";
+    private static final int MAX_NUM_EVENTS = 100;
 
     private PlaceEventListener placeEventListener;
     private CommunicationListener communicationListener;
-    public static final String APPSERVICE_STARTED_ACTION = "appservice_started";
-    private static final int MAX_NUM_EVENTS = 100;
     private LinkedList<String> events;
+
     @Override
     public void onCreate(){
         events = new LinkedList<>(GimbalDAO.getEvents(getApplicationContext()));
-        Gimbal.setApiKey(this.getApplication(), "YOUR API KEY HERE");
 
-        // Setup PlaceEventListener
+        Gimbal.setApiKey(this.getApplication(), "YOUR_API_KEY_HERE");
+        setupGimbalPlaceManager();
+        setupGimbalCommunicationManager();
+    }
+
+    private void setupGimbalCommunicationManager() {
+        communicationListener = new CommunicationListener() {
+            @Override
+            public Notification.Builder prepareCommunicationForDisplay(Communication communication, Visit visit, int notificationId) {
+                addEvent(String.format( "Communication Delivered : %s", communication.getTitle()));
+                // If you want a custom notification create and return it here
+                return null;
+            }
+
+            @Override
+            public Notification.Builder prepareCommunicationForDisplay(Communication communication, Push push, int notificationId) {
+                addEvent(String.format( "Push Communication Delivered : %s", communication.getTitle()));
+                // If you want a custom notification create and return it here
+                return null;
+            }
+
+            @Override
+            public void onNotificationClicked(List<Communication> communications) {
+                for (Communication communication : communications) {
+                    if(communication != null) {
+                        addEvent("Communication Clicked");
+                    }
+                }
+            }
+        };
+        CommunicationManager.getInstance().addListener(communicationListener);
+        CommunicationManager.getInstance().startReceivingCommunications();
+    }
+
+    private void setupGimbalPlaceManager() {
         placeEventListener = new PlaceEventListener() {
 
             @Override
@@ -47,35 +79,6 @@ public class AppService extends Service {
         };
         PlaceManager.getInstance().addListener(placeEventListener);
         PlaceManager.getInstance().startMonitoring();
-
-        // Setup CommunicationListener
-        communicationListener = new CommunicationListener() {
-            @Override
-            public Notification.Builder prepareCommunicationForDisplay(Communication communication, Visit visit, int notificationId) {
-                addEvent(String.format( "Communication Delivered :"+communication.getTitle()));
-                // If you want a custom notification create and return it here
-                return null;
-            }
-
-            @Override
-            public Notification.Builder prepareCommunicationForDisplay(Communication communication, Push push, int notificationId) {
-                addEvent(String.format( "Push Communication Delivered :"+communication.getTitle()));
-                // If you want a custom notification create and return it here
-                return null;
-            }
-
-            @Override
-            public void onNotificationClicked(List<Communication> communications) {
-                for (Communication communication : communications) {
-                    if(communication != null) {
-                        addEvent(String.format( "Communication Clicked"));
-                    }
-                }
-            }
-        };
-        CommunicationManager.getInstance().addListener(communicationListener);
-        CommunicationManager.getInstance().startReceivingCommunications();
-
     }
 
     private void addEvent(String event) {
