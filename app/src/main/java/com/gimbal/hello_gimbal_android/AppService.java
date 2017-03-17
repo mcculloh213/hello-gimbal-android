@@ -33,6 +33,7 @@ public class AppService extends Service {
         Gimbal.setApiKey(this.getApplication(), "YOUR_API_KEY_HERE");
         setupGimbalPlaceManager();
         setupGimbalCommunicationManager();
+        Gimbal.start();
     }
 
     private void setupGimbalCommunicationManager() {
@@ -61,7 +62,6 @@ public class AppService extends Service {
             }
         };
         CommunicationManager.getInstance().addListener(communicationListener);
-        CommunicationManager.getInstance().startReceivingCommunications();
     }
 
     private void setupGimbalPlaceManager() {
@@ -78,7 +78,6 @@ public class AppService extends Service {
             }
         };
         PlaceManager.getInstance().addListener(placeEventListener);
-        PlaceManager.getInstance().startMonitoring();
     }
 
     private void addEvent(String event) {
