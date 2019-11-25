@@ -30,7 +30,7 @@ public class AppService extends Service {
     public void onCreate(){
         events = new LinkedList<>(GimbalDAO.getEvents(getApplicationContext()));
 
-        Gimbal.setApiKey(this.getApplication(), "YOUR_API_KEY_HERE");
+        Gimbal.setApiKey(this.getApplication(), "f47a3532-2986-4ffe-91d6-5ceb75c3f1ff");
         setupGimbalPlaceManager();
         setupGimbalCommunicationManager();
         Gimbal.start();

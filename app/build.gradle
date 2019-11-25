@@ -24,6 +24,9 @@ android {
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.gimbal.android.v2:gimbal-sdk:2.72'
+    implementation 'com.gimbal.android.v4:gimbal-sdk:4.2.1'
     implementation 'com.gimbal.android.v4:gimbal-slf4j-impl:4.2.1'
+    implementation 'com.google.android.gms:play-services-ads-identifier:17.0.0'
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.google.firebase:firebase-messaging:20.0.1'
 }
