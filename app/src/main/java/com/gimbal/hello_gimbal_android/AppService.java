@@ -3,8 +3,11 @@ package com.gimbal.hello_gimbal_android;
 import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
+import android.location.Location;
 import android.os.IBinder;
 
+import com.gimbal.android.Beacon;
+import com.gimbal.android.BeaconSighting;
 import com.gimbal.android.Communication;
 import com.gimbal.android.CommunicationListener;
 import com.gimbal.android.CommunicationManager;
@@ -16,6 +19,7 @@ import com.gimbal.android.Visit;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 public class AppService extends Service {
 
@@ -66,15 +70,18 @@ public class AppService extends Service {
 
     private void setupGimbalPlaceManager() {
         placeEventListener = new PlaceEventListener() {
-
+//            @Override
+//            public void onVisitStart(Visit visit) {
+//                addEvent(String.format("Start Visit for %s", visit.getPlace().getName()));
+//            }
             @Override
-            public void onVisitStart(Visit visit) {
-                addEvent(String.format("Start Visit for %s", visit.getPlace().getName()));
+            public void onBeaconSighting(BeaconSighting sighting, List<Visit> places) {
+                Beacon beacon = sighting.getBeacon();
+                addEvent("Beacon identified: " + beacon.getIdentifier());
             }
-
             @Override
-            public void onVisitEnd(Visit visit) {
-                addEvent(String.format("End Visit for %s", visit.getPlace().getName()));
+            public void locationDetected(Location location) {
+                addEvent(String.format(Locale.getDefault(), "Location = %.3f Lat, %.3f Lng", location.getLatitude(), location.getLongitude()));
             }
         };
         PlaceManager.getInstance().addListener(placeEventListener);
